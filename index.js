@@ -25,6 +25,25 @@ async function run() {
         // * All Collection list are here 
         const database = client.db("ImportExport_DB"); 
         const usersCollection = database.collection("users"); 
+
+        app.post("/register", async (req, res) => {
+            const data = req.body; 
+            const ifExist = await usersCollection.findOne(data.email); 
+            if(ifExist){
+               return res.send({
+                    success: false, 
+                    message: "You are already registered"
+                })
+            }; 
+
+            const result = await usersCollection.insertOne(data); 
+            
+            return res.send({
+                success: true, 
+                message: "you have Successfully registered", 
+                data: result
+            })
+        })
         
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
