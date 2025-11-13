@@ -36,7 +36,7 @@ async function run() {
 
         app.post("/register", async (req, res) => {
             const data = req.body; 
-            const ifExist = await usersCollection.findOne(data.email); 
+            const ifExist = await usersCollection.findOne({ email: data.email }); 
             if(ifExist){
                return res.send({
                     success: false, 
@@ -51,6 +51,28 @@ async function run() {
                 message: "you have Successfully registered", 
                 data: result
             })
+        }); 
+
+        app.put("/register", async (req, res) => {
+            const data = req.body; 
+            // console.log(data)
+            const query = { email: data.email }
+            const ifExist = await usersCollection.findOne(query); 
+            if(ifExist) {
+                const update = { $set: { lastSignInTime: data.lastSignInTime, lastLoginAt: data.lastLoginAt }}
+                await usersCollection.updateOne(query, update)
+                return res.send({
+                    success: true, 
+                    message: "You have successfully Register", 
+                })
+            } else {
+                const result = await usersCollection.insertOne(data); 
+                return res.status(201).send({
+                    success: true, 
+                    message:" You have successfully login", 
+                    data: result
+                })
+            }
         })
         
         // Send a ping to confirm a successful connection
@@ -58,7 +80,7 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
-        await client.close();
+        // await client.close();
     }
 }
 run().catch(console.dir);
