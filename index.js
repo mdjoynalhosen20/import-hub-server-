@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const app = express()
 const cors = require("cors")
@@ -77,8 +77,35 @@ async function run() {
         })
         
         // Export related CRUD 
+
+        app.get('/allProducts', async (req, res) => {
+            const result = await exportsCollection.find().toArray();
+            return res.send(result)
+        }); 
+
+        app.get('/productDetails/:id', async (req, res) => {
+            try {
+                const { id } = req.params;
+                if (!id) {
+                    return res.status(400).send({ error: 'Missing id parameter' });
+                }
+                const query = { _id: new ObjectId(id) };
+                const result = await exportsCollection.findOne(query);
+
+                if (!result) {
+                    return res.status(404).send({ error: 'Product not found' });
+                }
+
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({ error: 'Server error' });
+            }
+        });
+
+        
         app.get('/myExports', async (req, res) => {
-            const exporter = req.body; 
+            const exporter = req.query; 
             const query = { exporter : exporter?.email}; 
             // const query = { exporter: "soponislam132s@gmail.com" };
             const result = await exportsCollection.find(query).toArray(); 
