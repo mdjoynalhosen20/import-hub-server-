@@ -127,6 +127,13 @@ async function run() {
             })
         })
 
+        app.get('/imports', async(req, res) => {
+            const { email } = req.query; 
+            const query = {importerEmail: email}; 
+            const result = await importsCollection.find(query).toArray(); 
+            res.send(result)
+        })
+
         app.post('/imports', async (req, res) => {
             const data = req.body; 
             const productId = data.productId; 
