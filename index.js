@@ -77,11 +77,20 @@ async function run() {
         })
         
         // Export related CRUD 
+        app.get('/myExports', async (req, res) => {
+            const exporter = req.body; 
+            const query = { exporter : exporter?.email}; 
+            // const query = { exporter: "soponislam132s@gmail.com" };
+            const result = await exportsCollection.find(query).toArray(); 
+            // console.log(result);
+            return res.send(result)
+        })
+        
         app.post('/addExport', async (req, res) => {
             const exportsData = req.body; 
             const createdAt = new Date().getTime(); 
             const dataToInsert = {...exportsData, createdAt}
-            console.log(dataToInsert);
+            // console.log(dataToInsert);
             const result = await exportsCollection.insertOne(dataToInsert)
             return res.status(201).send({
                 success: true, 
