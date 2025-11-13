@@ -84,6 +84,15 @@ async function run() {
             return res.send(result)
         }); 
 
+        app.get('/latestProducts', async (req, res) => {
+            const result = await exportsCollection
+                .find()
+                .sort({ createdAt: -1 })
+                .limit(6)
+                .toArray();
+            res.send(result);
+        });
+
         app.get('/productDetails/:id', async (req, res) => {
             try {
                 const { id } = req.params;
