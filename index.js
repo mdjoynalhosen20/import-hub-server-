@@ -33,7 +33,8 @@ async function run() {
         // * All Collection list are here 
         const database = client.db("ImportExport_DB"); 
         const usersCollection = database.collection("users"); 
-        const exportsCollection = database.collection("Exports")
+        const exportsCollection = database.collection("Exports"); 
+        const importsCollection = database.collection("imports")
 
         app.post("/register", async (req, res) => {
             const data = req.body; 
@@ -125,6 +126,33 @@ async function run() {
                 data: result
             })
         })
+
+        app.post('/imports', async (req, res) => {
+            const data = req.body; 
+            const productId = data.productId; 
+            const importerEmail = data.importerEmail 
+            const filter = { productId, importerEmail }
+            const exist = await importsCollection.findOne(filter); 
+            if(exist){ 
+                const udateDocument = { 
+                    $inc: { quantity: -quantity },
+                }; 
+                const result = await exportsCollection.updateOne({_id: new ObjectId(productId)}, udateDocument)
+               return res.send({
+                    success: true, 
+                    message: "You have successfuly import a prodct ",
+                    data: result
+                })
+            }
+
+            const result = await importsCollection.insertOne(data); 
+            
+            return res.send({
+                success: true,
+                message: "You have successfuly import a prodct ",
+                data: result
+            })
+        }); 
         
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
