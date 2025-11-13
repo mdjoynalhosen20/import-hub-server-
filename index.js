@@ -33,6 +33,7 @@ async function run() {
         // * All Collection list are here 
         const database = client.db("ImportExport_DB"); 
         const usersCollection = database.collection("users"); 
+        const exportsCollection = database.collection("Exports")
 
         app.post("/register", async (req, res) => {
             const data = req.body; 
@@ -73,6 +74,20 @@ async function run() {
                     data: result
                 })
             }
+        })
+        
+        // Export related CRUD 
+        app.post('/addExport', async (req, res) => {
+            const exportsData = req.body; 
+            const createdAt = new Date().getTime(); 
+            const dataToInsert = {...exportsData, createdAt}
+            console.log(dataToInsert);
+            const result = await exportsCollection.insertOne(dataToInsert)
+            return res.status(201).send({
+                success: true, 
+                message: "Exports Successfull!", 
+                data: result
+            })
         })
         
         // Send a ping to confirm a successful connection
